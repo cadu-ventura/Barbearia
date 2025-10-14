@@ -257,3 +257,48 @@
   user-select: none;
 }
 
+/* 📱 Otimizações específicas para dispositivos móveis */
+@media (max-width: 768px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Melhor performance de scroll em mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Otimização de botões para touch */
+  button, .barbearia-btn-primary, .barbearia-btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Prevenção de zoom indesejado em inputs */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* 🌐 Melhorias para carregamento */
+.mobile-device * {
+  /* Acelerar animações em dispositivos móveis */
+  animation-duration: 0.2s !important;
+  transition-duration: 0.2s !important;
+}
+
+/* 🔧 Fallbacks para navegadores mais antigos */
+@supports not (backdrop-filter: blur(16px)) {
+  .barbearia-glass {
+    background: rgba(30, 41, 59, 0.95);
+  }
+}
+

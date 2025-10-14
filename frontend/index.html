@@ -3,12 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Mobile optimizations -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#1e40af" />
+    
+    <!-- Preconnect for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    
     <title>💈 Barbearia Hoshirara - Sistema de Gestão</title>
     <meta name="description" content="Sistema completo de gestão para barbearias com React e TypeScript" />
     
     <!-- GitHub Pages SPA support -->
     <script type="text/javascript">
+      // Single Page Apps for GitHub Pages - Mobile optimized
       (function(l) {
         if (l.search[1] === '/' ) {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
@@ -18,11 +31,56 @@
               l.pathname.slice(0, -1) + decoded + l.hash
           );
         }
-      }(window.location))
+      }(window.location));
+      
+      // Mobile detection and optimization
+      if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        document.documentElement.classList.add('mobile-device');
+      }
     </script>
+    
+    <!-- Loading styles to prevent FOUC -->
+    <style>
+      #root {
+        min-height: 100vh;
+        background: #0f172a;
+      }
+      
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #0f172a;
+        color: #60a5fa;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="loading">
+        <div>💈 Carregando Barbearia Hoshirara...</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker registration for better mobile performance -->
+    <script>
+      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function() {
+            // Service worker registration failed, but app should still work
+          });
+        });
+      }
+    </script>
   </body>
 </html>
