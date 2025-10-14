@@ -1,2 +1,259 @@
 @import 'tailwindcss';
 
+/* =========================================
+   💈 BARBEARIA HOSHIRARA - ESTILOS GLOBAIS
+   ========================================= */
+
+/* 🎨 Variáveis CSS Personalizadas */
+:root {
+  --barbearia-primary: #1e40af;
+  --barbearia-secondary: #4338ca;
+  --barbearia-accent: #60a5fa;
+  --barbearia-bg: #0f172a;
+  --barbearia-surface: #1e293b;
+  --barbearia-border: #334155;
+  --barbearia-transition: 300ms ease-in-out;
+}
+
+/* 📱 Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+  transition: var(--barbearia-transition);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--barbearia-primary);
+}
+
+/* 🎯 Classes utilitárias customizadas que não conflitam com Tailwind */
+.barbearia-glass {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(203, 213, 225, 0.1);
+}
+
+.barbearia-gradient {
+  background: linear-gradient(135deg, var(--barbearia-primary) 0%, var(--barbearia-secondary) 100%);
+}
+
+.barbearia-text-gradient {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.barbearia-shadow-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.barbearia-shadow-glow:hover {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+/* ⚡ Animações personalizadas */
+@keyframes barbearia-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes barbearia-slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes barbearia-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes barbearia-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 🎨 Classes de animação */
+.barbearia-animate-fadeIn {
+  animation: barbearia-fadeIn 0.5s ease-out;
+}
+
+.barbearia-animate-slideIn {
+  animation: barbearia-slideIn 0.5s ease-out;
+}
+
+.barbearia-animate-pulse {
+  animation: barbearia-pulse 2s infinite;
+}
+
+/* � Loading skeleton */
+.barbearia-skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: barbearia-loading 1.5s infinite;
+}
+
+/* 🎯 Estados de interação */
+.barbearia-interactive {
+  transition: var(--barbearia-transition);
+  cursor: pointer;
+}
+
+.barbearia-interactive:hover {
+  transform: translateY(-1px);
+}
+
+.barbearia-hover-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+  transition: var(--barbearia-transition);
+}
+
+/* 🎨 Estilos de componentes específicos para uso no React */
+.barbearia-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.barbearia-card:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.barbearia-btn-primary {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.barbearia-btn-primary:hover {
+  background: linear-gradient(to right, #1d4ed8, #4338ca);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.barbearia-btn-primary:active {
+  transform: scale(0.95);
+}
+
+.barbearia-btn-secondary {
+  border: 2px solid #3b82f6;
+  color: #60a5fa;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.barbearia-btn-secondary:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.barbearia-btn-secondary:active {
+  transform: scale(0.95);
+}
+
+.barbearia-input {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.barbearia-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.barbearia-input::placeholder {
+  color: #64748b;
+}
+
+/* � Gradientes adicionais */
+.barbearia-bg-primary {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.barbearia-bg-secondary {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+/* 🔥 Efeitos de hover especiais */
+.barbearia-highlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.barbearia-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: var(--barbearia-transition);
+}
+
+.barbearia-highlight:hover::before {
+  left: 100%;
+}
+
+/* 🎯 Utilidades finais */
+.barbearia-smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+.barbearia-no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
