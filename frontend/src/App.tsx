@@ -10,7 +10,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <AppProvider>
-        <Router>
+        <Router basename="/Barbearia">
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
