@@ -1,8 +1,11 @@
 import React from 'react';
-import { useApp } from '../hooks/useApp';
+import { useClientes, useAgendamentos, useBarbeiros } from '../contexts';
 
 const Dashboard: React.FC = () => {
-  const { clientes, agendamentos, movimentacoes, barbeiros } = useApp();
+  const { items: clientes } = useClientes();
+  const { items: agendamentos } = useAgendamentos();
+  const { items: barbeiros } = useBarbeiros();
+  const movimentacoes: Array<{tipo: 'receita' | 'despesa', valor: number}> = []; // TODO: Implementar contexto financeiro
 
   // Calcular estatísticas em tempo real
   const totalClientes = clientes.filter(c => c.ativo).length;

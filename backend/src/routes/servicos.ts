@@ -18,9 +18,9 @@ router.get('/', authenticateToken, authorize(['admin', 'funcionario', 'barbeiro'
       descricao: servico.descricao,
       preco: servico.preco,
       duracao: servico.duracao,
-      categoria: servico.categoria,
+      categoria: 'Geral', // Valor padrão pois não temos categoria na tabela atual
       ativo: Boolean(servico.ativo),
-      dataCadastro: new Date(servico.created_at)
+      dataCadastro: new Date(servico.data_cadastro)
     }));
 
     res.json({
@@ -43,14 +43,13 @@ router.post('/', authenticateToken, authorize(['admin']), servicoValidation, asy
 
     const result = await req.db.run(`
       INSERT INTO servicos (
-        nome, descricao, preco, duracao, categoria, ativo
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        nome, descricao, preco, duracao, ativo
+      ) VALUES (?, ?, ?, ?, ?)
     `, [
       servicoData.nome,
       servicoData.descricao || null,
       servicoData.preco,
       servicoData.duracao,
-      servicoData.categoria,
       servicoData.ativo !== false ? 1 : 0
     ]);
 

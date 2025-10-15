@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Plus, Search, Edit, Trash2 } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
 import Modal from '../components/common/Modal';
 import MovimentacaoForm from '../components/common/MovimentacaoForm';
 
+interface MovimentacaoTemp {
+  id: string;
+  descricao: string;
+  tipo: 'receita' | 'despesa';
+  valor: number;
+  categoria: 'servico' | 'comissao' | 'produto' | 'aluguel' | 'energia' | 'agua' | 'internet' | 'material' | 'marketing' | 'outros';
+  data: Date | string;
+  formaPagamento: 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'outros';
+}
+
 const Financeiro: React.FC = () => {
-  const { movimentacoes, excluirMovimentacao } = useApp();
+  // TODO: Implementar contexto de movimentações financeiras
+  const movimentacoes: MovimentacaoTemp[] = []; // Placeholder até implementar MovimentacoesContext
+  const excluirMovimentacao = (id: string) => {
+    console.log('Excluir movimentação:', id);
+  };
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMovimentacao, setSelectedMovimentacao] = useState<any>(null);
+  const [selectedMovimentacao, setSelectedMovimentacao] = useState<MovimentacaoTemp | null>(null);
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
 
   const filteredMovimentacoes = movimentacoes.filter(mov => {
@@ -338,7 +352,7 @@ const Financeiro: React.FC = () => {
         size="lg"
       >
         <MovimentacaoForm
-          movimentacao={selectedMovimentacao}
+          movimentacao={selectedMovimentacao || undefined}
           onClose={handleModalClose}
           onSave={handleModalSave}
         />

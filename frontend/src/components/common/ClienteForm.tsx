@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../hooks/useApp';
+import { useClientes } from '../../contexts';
 import type { Cliente } from '../../types';
 
 interface ClienteFormProps {
@@ -9,24 +9,14 @@ interface ClienteFormProps {
 }
 
 const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose, onSave }) => {
-  const { adicionarCliente, atualizarCliente } = useApp();
+  const { create: adicionarCliente, update: editarCliente } = useClientes();
   const isEditing = !!cliente;
 
   const [formData, setFormData] = useState({
     nome: cliente?.nome || '',
     email: cliente?.email || '',
     telefone: cliente?.telefone || '',
-    cpf: cliente?.cpf || '',
-    dataNascimento: cliente?.dataNascimento ? cliente.dataNascimento.toISOString().split('T')[0] : '',
-    endereco: {
-      cep: cliente?.endereco?.cep || '',
-      logradouro: cliente?.endereco?.logradouro || '',
-      numero: cliente?.endereco?.numero || '',
-      complemento: cliente?.endereco?.complemento || '',
-      bairro: cliente?.endereco?.bairro || '',
-      cidade: cliente?.endereco?.cidade || '',
-      estado: cliente?.endereco?.estado || ''
-    },
+    dataNascimento: cliente?.dataNascimento || '',
     observacoes: cliente?.observacoes || ''
   });
 
@@ -35,21 +25,10 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose, onSave }) =
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    if (name.startsWith('endereco.')) {
-      const field = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        endereco: {
-          ...prev.endereco,
-          [field]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
 
     // Limpar erro do campo quando o usuário começar a digitar
     if (errors[name]) {
@@ -81,35 +60,48 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose, onSave }) =
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    const clienteData = {
-      nome: formData.nome,
-      email: formData.email,
-      telefone: formData.telefone,
-      cpf: formData.cpf || undefined,
-      dataNascimento: formData.dataNascimento ? new Date(formData.dataNascimento) : undefined,
-      endereco: formData.endereco.cep ? formData.endereco : undefined,
-      observacoes: formData.observacoes || undefined,
-      ativo: cliente?.ativo ?? true,
-      dataCadastro: cliente?.dataCadastro || new Date(),
-      ultimoAtendimento: cliente?.ultimoAtendimento,
-      totalAtendimentos: cliente?.totalAtendimentos || 0
-    };
+    try {
+      const clienteData = {
+        nome: formData.nome.trim(),
+        email: formData.email.trim(),
+        telefone: formData.telefone.trim(),
+        dataNascimento: formData.dataNascimento || undefined,
+        observacoes: formData.observacoes?.trim() || undefined
+      };
 
-    if (isEditing && cliente) {
-      atualizarCliente(cliente.id, clienteData);
-    } else {
-      adicionarCliente(clienteData);
+      console.log('🔄 Submetendo formulário cliente:', clienteData);
+
+      if (isEditing && cliente) {
+        await editarCliente(cliente.id, clienteData);
+        console.log('✅ Cliente editado com sucesso!');
+      } else {
+        await adicionarCliente(clienteData);
+        console.log('✅ Cliente criado com sucesso!');
+      }
+
+      // Chamar callbacks com segurança
+      try {
+        onSave?.();
+      } catch (callbackError) {
+        console.error('Erro no callback onSave:', callbackError);
+      }
+      
+      try {
+        onClose?.();
+      } catch (callbackError) {
+        console.error('Erro no callback onClose:', callbackError);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao salvar cliente:', error);
+      alert('Erro ao salvar cliente. Verifique os dados e tente novamente.');
     }
-
-    onSave();
-    onClose();
   };
 
   return (
@@ -169,20 +161,6 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose, onSave }) =
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            CPF
-          </label>
-          <input
-            type="text"
-            name="cpf"
-            value={formData.cpf}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base"
-            placeholder="000.000.000-00"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
             Data de Nascimento
           </label>
           <input
@@ -192,111 +170,6 @@ const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose, onSave }) =
             onChange={handleChange}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
-        </div>
-      </div>
-
-      {/* Endereço */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-slate-800 mb-4">Endereço</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              CEP
-            </label>
-            <input
-              type="text"
-              name="endereco.cep"
-              value={formData.endereco.cep}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="00000-000"
-            />
-          </div>
-
-          <div className="sm:col-span-2 lg:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Logradouro
-            </label>
-            <input
-              type="text"
-              name="endereco.logradouro"
-              value={formData.endereco.logradouro}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="Rua, Avenida, etc."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Número
-            </label>
-            <input
-              type="text"
-              name="endereco.numero"
-              value={formData.endereco.numero}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="123"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Complemento
-            </label>
-            <input
-              type="text"
-              name="endereco.complemento"
-              value={formData.endereco.complemento}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="Apto, Bloco, etc."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Bairro
-            </label>
-            <input
-              type="text"
-              name="endereco.bairro"
-              value={formData.endereco.bairro}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="Nome do bairro"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Cidade
-            </label>
-            <input
-              type="text"
-              name="endereco.cidade"
-              value={formData.endereco.cidade}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="Nome da cidade"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Estado
-            </label>
-            <input
-              type="text"
-              name="endereco.estado"
-              value={formData.endereco.estado}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              placeholder="SP"
-              maxLength={2}
-            />
-          </div>
         </div>
       </div>
 

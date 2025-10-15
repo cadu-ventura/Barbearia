@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../hooks/useApp';
+import { useBarbeiros } from '../../contexts';
 import type { Barbeiro } from '../../types';
 
 interface BarbeiroFormProps {
@@ -9,7 +9,7 @@ interface BarbeiroFormProps {
 }
 
 const BarbeiroForm: React.FC<BarbeiroFormProps> = ({ barbeiro, onClose, onSave }) => {
-  const { adicionarBarbeiro, atualizarBarbeiro } = useApp();
+  const { create: adicionarBarbeiro, update: atualizarBarbeiro } = useBarbeiros();
   const isEditing = !!barbeiro;
 
   const [formData, setFormData] = useState({
@@ -145,13 +145,6 @@ const BarbeiroForm: React.FC<BarbeiroFormProps> = ({ barbeiro, onClose, onSave }
       return;
     }
 
-    // Converter horário simples para formato HorarioTrabalho[]
-    const horarioTrabalhoFormatado = formData.horarioTrabalho.diasSemana.map(dia => ({
-      diaSemana: dia,
-      horaInicio: formData.horarioTrabalho.inicio,
-      horaFim: formData.horarioTrabalho.fim
-    }));
-
     const barbeiroData = {
       nome: formData.nome,
       telefone: formData.telefone,
@@ -159,7 +152,7 @@ const BarbeiroForm: React.FC<BarbeiroFormProps> = ({ barbeiro, onClose, onSave }
       cpf: formData.cpf,
       especialidades: formData.especialidades,
       comissao: Number(formData.comissao),
-      horarioTrabalho: horarioTrabalhoFormatado,
+      horarioTrabalho: `${formData.horarioTrabalho.inicio} - ${formData.horarioTrabalho.fim}`,
       ativo: barbeiro?.ativo ?? true,
       dataCadastro: typeof formData.dataCadastro === 'string' ? new Date(formData.dataCadastro) : formData.dataCadastro,
       totalAtendimentos: barbeiro?.totalAtendimentos ?? 0

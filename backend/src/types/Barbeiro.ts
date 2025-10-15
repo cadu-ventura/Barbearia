@@ -7,9 +7,9 @@ export interface Barbeiro {
   especialidades: string[];
   comissao?: number;
   ativo: boolean;
-  totalAtendimentos: number;
-  avaliacaoMedia: number;
-  dataCadastro: Date;
+  totalAtendimentos?: number;
+  avaliacaoMedia?: number;
+  dataCadastro?: string;
 }
 
 export interface BarbeiroInput {

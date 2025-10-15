@@ -4,21 +4,13 @@ export interface Cliente {
   email?: string;
   telefone: string;
   cpf?: string;
-  dataNascimento?: Date;
-  endereco?: {
-    cep: string;
-    logradouro: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    complemento?: string;
-  };
+  dataNascimento?: string;
+  observacoes?: string;
   ativo: boolean;
-  totalAtendimentos: number;
-  avaliacaoMedia: number;
+  totalAtendimentos?: number;
+  avaliacaoMedia?: number;
   ultimoAtendimento?: Date;
-  dataCadastro: Date;
+  dataCadastro?: string;
 }
 
 export interface ClienteInput {
@@ -43,20 +35,10 @@ export interface ClienteDB {
   id: number;
   nome: string;
   email?: string;
-  telefone: string;
-  cpf?: string;
+  telefone?: string;
   data_nascimento?: string;
-  endereco_cep?: string;
-  endereco_logradouro?: string;
-  endereco_numero?: string;
-  endereco_bairro?: string;
-  endereco_cidade?: string;
-  endereco_estado?: string;
-  endereco_complemento?: string;
+  observacoes?: string;
   ativo: number;
-  total_atendimentos: number;
-  avaliacao_media: number;
-  ultimo_atendimento?: string;
   created_at: string;
   updated_at?: string;
 }

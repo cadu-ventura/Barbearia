@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
-import { useApp } from '../../hooks/useApp';
-import type { MovimentacaoFinanceira, TipoMovimentacao, CategoriaFinanceira, FormaPagamento } from '../../types';
+
+// TODO: Implementar tipos para MovimentacaoFinanceira
+type MovimentacaoFinanceira = {
+  id: string;
+  tipo: TipoMovimentacao;
+  valor: number;
+  descricao: string;
+  categoria: CategoriaFinanceira;
+  data: Date | string;
+  formaPagamento: FormaPagamento;
+};
+
+type TipoMovimentacao = 'receita' | 'despesa';
+type CategoriaFinanceira = 'servico' | 'comissao' | 'produto' | 'aluguel' | 'energia' | 'agua' | 'internet' | 'material' | 'marketing' | 'outros';
+type FormaPagamento = 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'outros';
 
 interface MovimentacaoFormProps {
   movimentacao?: MovimentacaoFinanceira;
@@ -9,7 +22,14 @@ interface MovimentacaoFormProps {
 }
 
 const MovimentacaoForm: React.FC<MovimentacaoFormProps> = ({ movimentacao, onClose, onSave }) => {
-  const { adicionarMovimentacao, atualizarMovimentacao } = useApp();
+  // TODO: Implementar contexto de movimentações financeiras
+  const adicionarMovimentacao = (data: any) => {
+    console.log('Adicionar movimentação:', data);
+  };
+  const atualizarMovimentacao = (id: string, data: any) => {
+    console.log('Atualizar movimentação:', id, data);
+  };
+  
   const isEditing = !!movimentacao;
 
   const [formData, setFormData] = useState({

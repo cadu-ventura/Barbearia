@@ -18,12 +18,12 @@ router.get('/', authenticateToken, authorize(['admin', 'funcionario', 'barbeiro'
       email: barbeiro.email,
       telefone: barbeiro.telefone,
       cpf: barbeiro.cpf,
-      especialidades: JSON.parse(barbeiro.especialidades || '[]'),
-      comissao: barbeiro.comissao,
+      especialidades: barbeiro.especialidades ? barbeiro.especialidades.split(', ') : [],
+      comissao: barbeiro.comissao || 50,
       ativo: Boolean(barbeiro.ativo),
       totalAtendimentos: barbeiro.total_atendimentos || 0,
       avaliacaoMedia: barbeiro.avaliacao_media || 0,
-      dataCadastro: new Date(barbeiro.created_at)
+      dataCadastro: barbeiro.created_at
     }));
 
     res.json({
@@ -46,14 +46,13 @@ router.post('/', authenticateToken, authorize(['admin']), barbeiroValidation, as
 
     const result = await req.db.run(`
       INSERT INTO barbeiros (
-        nome, email, telefone, cpf, especialidades, comissao, ativo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        nome, email, telefone, especialidades, comissao, ativo
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `, [
       barbeiroData.nome,
       barbeiroData.email || null,
       barbeiroData.telefone || null,
-      barbeiroData.cpf || null,
-      JSON.stringify(barbeiroData.especialidades),
+      barbeiroData.especialidades.join(', '),
       barbeiroData.comissao || null,
       barbeiroData.ativo !== false ? 1 : 0
     ]);
@@ -64,7 +63,7 @@ router.post('/', authenticateToken, authorize(['admin']), barbeiroValidation, as
       ativo: barbeiroData.ativo !== false,
       totalAtendimentos: 0,
       avaliacaoMedia: 0,
-      dataCadastro: new Date()
+      dataCadastro: new Date().toISOString()
     };
 
     res.status(201).json({
@@ -92,7 +91,6 @@ router.put('/:id', authenticateToken, authorize(['admin']), validateId, barbeiro
         nome = ?,
         email = ?,
         telefone = ?,
-        cpf = ?,
         especialidades = ?,
         comissao = ?,
         ativo = ?,
@@ -102,8 +100,7 @@ router.put('/:id', authenticateToken, authorize(['admin']), validateId, barbeiro
       barbeiroData.nome,
       barbeiroData.email || null,
       barbeiroData.telefone || null,
-      barbeiroData.cpf || null,
-      JSON.stringify(barbeiroData.especialidades),
+      barbeiroData.especialidades.join(', '),
       barbeiroData.comissao || null,
       barbeiroData.ativo !== false ? 1 : 0,
       id

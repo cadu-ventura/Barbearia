@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { useApp } from '../../hooks/useApp';
-import type { Servico, CategoriaServico } from '../../types';
+import { useServicos } from '../../contexts';
+import type { Servico } from '../../types';
+
+type CategoriaServico = 'corte' | 'barba' | 'combo' | 'outros';
 
 interface ServicoFormProps {
   servico?: Servico;
@@ -9,7 +11,7 @@ interface ServicoFormProps {
 }
 
 const ServicoForm: React.FC<ServicoFormProps> = ({ servico, onClose, onSave }) => {
-  const { adicionarServico, atualizarServico } = useApp();
+  const { create: adicionarServico, update: atualizarServico } = useServicos();
   const isEditing = !!servico;
 
   const [formData, setFormData] = useState({

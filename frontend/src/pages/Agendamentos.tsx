@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Plus, User, Scissors, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useAgendamentos, useClientes, useBarbeiros, useServicos } from '../contexts';
 
 const Agendamentos: React.FC = () => {
-  const { 
-    agendamentos, 
-    adicionarAgendamento, 
-    atualizarAgendamento, 
-    excluirAgendamento, 
-    clientes, 
-    barbeiros, 
-    servicos 
-  } = useApp();
+  const { items: agendamentos, create: adicionarAgendamento, update: atualizarAgendamento, remove: excluirAgendamento } = useAgendamentos();
+  const { items: clientes } = useClientes();
+  const { items: barbeiros } = useBarbeiros();
+  const { items: servicos } = useServicos();
   
   const [showModal, setShowModal] = useState(false);
   const [novoAgendamento, setNovoAgendamento] = useState({
@@ -108,10 +103,9 @@ const Agendamentos: React.FC = () => {
     setTimeout(() => setSucesso(''), 3000);
   };
 
-  const handleAtualizarStatus = (id: string, novoStatus: any) => {
+  const handleAtualizarStatus = (id: string, novoStatus: 'agendado' | 'em_andamento' | 'concluido' | 'cancelado' | 'nao_compareceu') => {
     atualizarAgendamento(id, { 
-      status: novoStatus,
-      dataAtualizacao: new Date()
+      status: novoStatus
     });
   };
 
@@ -132,14 +126,19 @@ const Agendamentos: React.FC = () => {
     }).join(', ');
   };
 
-  const formatarDataHora = (data: Date) => {
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(new Date(data));
+  const formatarDataHora = (data: Date | string) => {
+    try {
+      const dataObj = typeof data === 'string' ? new Date(data) : data;
+      return new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(dataObj);
+    } catch {
+      return 'Data inválida';
+    }
   };
 
   const getStatusIcon = (status: string) => {

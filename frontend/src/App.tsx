@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AppProvider } from './contexts/AppContext';
+import { AppProvider } from './contexts';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
@@ -10,7 +10,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <AppProvider>
-        <Router basename="/Barbearia">
+        <Router>
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>

@@ -106,20 +106,11 @@ router.get('/', authenticateToken, authorize(['admin', 'funcionario']), async (r
         nome,
         email,
         telefone,
-        cpf,
         data_nascimento,
-        endereco_cep,
-        endereco_logradouro,
-        endereco_numero,
-        endereco_bairro,
-        endereco_cidade,
-        endereco_estado,
-        endereco_complemento,
+        observacoes,
         ativo,
-        total_atendimentos,
-        avaliacao_media,
-        ultimo_atendimento,
-        created_at
+        created_at,
+        updated_at
       FROM clientes 
       ORDER BY nome ASC
     `) as ClienteDB[];
@@ -129,23 +120,13 @@ router.get('/', authenticateToken, authorize(['admin', 'funcionario']), async (r
       id: cliente.id.toString(),
       nome: cliente.nome,
       email: cliente.email,
-      telefone: cliente.telefone,
-      cpf: cliente.cpf,
-      dataNascimento: cliente.data_nascimento ? new Date(cliente.data_nascimento) : undefined,
-      endereco: cliente.endereco_cep ? {
-        cep: cliente.endereco_cep,
-        logradouro: cliente.endereco_logradouro!,
-        numero: cliente.endereco_numero!,
-        bairro: cliente.endereco_bairro!,
-        cidade: cliente.endereco_cidade!,
-        estado: cliente.endereco_estado!,
-        complemento: cliente.endereco_complemento
-      } : undefined,
+      telefone: cliente.telefone || '',
+      dataNascimento: cliente.data_nascimento,
+      observacoes: cliente.observacoes,
       ativo: Boolean(cliente.ativo),
-      totalAtendimentos: cliente.total_atendimentos || 0,
-      avaliacaoMedia: cliente.avaliacao_media || 0,
-      ultimoAtendimento: cliente.ultimo_atendimento ? new Date(cliente.ultimo_atendimento) : undefined,
-      dataCadastro: new Date(cliente.created_at)
+      totalAtendimentos: 0,
+      avaliacaoMedia: 0,
+      dataCadastro: cliente.created_at
     }));
 
     res.json({
@@ -180,23 +161,13 @@ router.get('/:id', authenticateToken, authorize(['admin', 'funcionario']), valid
       id: cliente.id.toString(),
       nome: cliente.nome,
       email: cliente.email,
-      telefone: cliente.telefone,
-      cpf: cliente.cpf,
-      dataNascimento: cliente.data_nascimento ? new Date(cliente.data_nascimento) : undefined,
-      endereco: cliente.endereco_cep ? {
-        cep: cliente.endereco_cep,
-        logradouro: cliente.endereco_logradouro!,
-        numero: cliente.endereco_numero!,
-        bairro: cliente.endereco_bairro!,
-        cidade: cliente.endereco_cidade!,
-        estado: cliente.endereco_estado!,
-        complemento: cliente.endereco_complemento
-      } : undefined,
+      telefone: cliente.telefone || '',
+      dataNascimento: cliente.data_nascimento,
+      observacoes: cliente.observacoes,
       ativo: Boolean(cliente.ativo),
-      totalAtendimentos: cliente.total_atendimentos || 0,
-      avaliacaoMedia: cliente.avaliacao_media || 0,
-      ultimoAtendimento: cliente.ultimo_atendimento ? new Date(cliente.ultimo_atendimento) : undefined,
-      dataCadastro: new Date(cliente.created_at)
+      totalAtendimentos: 0,
+      avaliacaoMedia: 0,
+      dataCadastro: cliente.created_at
     };
 
     res.json({
@@ -215,38 +186,36 @@ router.get('/:id', authenticateToken, authorize(['admin', 'funcionario']), valid
 // Criar novo cliente
 router.post('/', authenticateToken, authorize(['admin', 'funcionario']), clienteValidation, async (req: any, res: Response) => {
   try {
+    console.log('=== CRIANDO CLIENTE ===');
+    console.log('Body recebido:', req.body);
+    
     const clienteData: ClienteInput = req.body;
+    console.log('Cliente data processado:', clienteData);
 
+    console.log('Executando INSERT...');
     const result = await req.db.run(`
       INSERT INTO clientes (
-        nome, email, telefone, cpf, data_nascimento,
-        endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro,
-        endereco_cidade, endereco_estado, endereco_complemento, ativo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nome, email, telefone, data_nascimento, observacoes, ativo
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `, [
       clienteData.nome,
       clienteData.email || null,
       clienteData.telefone,
-      clienteData.cpf || null,
       clienteData.dataNascimento || null,
-      clienteData.endereco?.cep || null,
-      clienteData.endereco?.logradouro || null,
-      clienteData.endereco?.numero || null,
-      clienteData.endereco?.bairro || null,
-      clienteData.endereco?.cidade || null,
-      clienteData.endereco?.estado || null,
-      clienteData.endereco?.complemento || null,
-      clienteData.ativo !== false ? 1 : 0
+      (clienteData as any).observacoes || null,
+      clienteData.ativo !== false
     ]);
+    
+    console.log('Resultado do INSERT:', result);
 
     const novoCliente: Partial<Cliente> = {
       id: result.lastID?.toString(),
       ...clienteData,
-      dataNascimento: clienteData.dataNascimento ? new Date(clienteData.dataNascimento) : undefined,
+      dataNascimento: clienteData.dataNascimento,
       ativo: clienteData.ativo !== false,
       totalAtendimentos: 0,
       avaliacaoMedia: 0,
-      dataCadastro: new Date()
+      dataCadastro: new Date().toISOString()
     };
 
     res.status(201).json({
@@ -274,15 +243,8 @@ router.put('/:id', authenticateToken, authorize(['admin', 'funcionario']), valid
         nome = ?,
         email = ?,
         telefone = ?,
-        cpf = ?,
         data_nascimento = ?,
-        endereco_cep = ?,
-        endereco_logradouro = ?,
-        endereco_numero = ?,
-        endereco_bairro = ?,
-        endereco_cidade = ?,
-        endereco_estado = ?,
-        endereco_complemento = ?,
+        observacoes = ?,
         ativo = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
@@ -290,16 +252,9 @@ router.put('/:id', authenticateToken, authorize(['admin', 'funcionario']), valid
       clienteData.nome,
       clienteData.email || null,
       clienteData.telefone,
-      clienteData.cpf || null,
       clienteData.dataNascimento || null,
-      clienteData.endereco?.cep || null,
-      clienteData.endereco?.logradouro || null,
-      clienteData.endereco?.numero || null,
-      clienteData.endereco?.bairro || null,
-      clienteData.endereco?.cidade || null,
-      clienteData.endereco?.estado || null,
-      clienteData.endereco?.complemento || null,
-      clienteData.ativo !== false ? 1 : 0,
+      (clienteData as any).observacoes || null,
+      clienteData.ativo !== false,
       id
     ]);
 
@@ -329,7 +284,7 @@ router.delete('/:id', authenticateToken, authorize(['admin']), validateId, async
     const { id } = req.params;
 
     const result = await req.db.run(`
-      UPDATE clientes SET ativo = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+      UPDATE clientes SET ativo = 0, data_atualizacao = CURRENT_TIMESTAMP WHERE id = ?
     `, [id]);
 
     if (result.changes === 0) {

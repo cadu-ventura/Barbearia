@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { Calendar, User, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useAgendamentos } from '../contexts/agendamentos';
+import { useBarbeiros } from '../contexts/barbeiros';
+import { useClientes } from '../contexts/clientes';
+import { useServicos } from '../contexts/servicos';
+import type { Agendamento, Barbeiro, Cliente, Servico } from '../types';
 
 const Horarios: React.FC = () => {
-  const { agendamentos, barbeiros, clientes, servicos } = useApp();
+  const { items: agendamentos } = useAgendamentos();
+  const { items: barbeiros } = useBarbeiros();
+  const { items: clientes } = useClientes();
+  const { items: servicos } = useServicos();
+  
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
   const [selectedBarbeiro, setSelectedBarbeiro] = useState<string>('todos');
@@ -42,7 +50,7 @@ const Horarios: React.FC = () => {
 
   // Função para obter agendamentos de uma data específica
   const getAgendamentosForDate = (date: Date) => {
-    return agendamentos.filter(agendamento => {
+    return agendamentos.filter((agendamento: Agendamento) => {
       const agendamentoDate = new Date(agendamento.dataHora);
       return agendamentoDate.toDateString() === date.toDateString() &&
              (selectedBarbeiro === 'todos' || agendamento.barbeiroId === selectedBarbeiro) &&
@@ -63,7 +71,7 @@ const Horarios: React.FC = () => {
         horario.setHours(hour, minute, 0, 0);
         
         // Verificar se já existe agendamento neste horário
-        const ocupado = agendamentos.some(ag => {
+        const ocupado = agendamentos.some((ag: Agendamento) => {
           if (ag.barbeiroId !== barbeiroId) return false;
           const agDate = new Date(ag.dataHora);
           return agDate.getTime() === horario.getTime() && ag.status !== 'cancelado';
@@ -111,19 +119,19 @@ const Horarios: React.FC = () => {
               </div>
               {weekDays.map((day, dayIndex) => {
                 const dayAgendamentos = getAgendamentosForDate(day);
-                const hourAgendamentos = dayAgendamentos.filter(ag => {
+                const hourAgendamentos = dayAgendamentos.filter((ag: Agendamento) => {
                   const agHour = new Date(ag.dataHora).getHours() + new Date(ag.dataHora).getMinutes() / 60;
                   return Math.abs(agHour - hour) < 0.25;
                 });
 
                 return (
                   <div key={`${hour}-${dayIndex}`} className="p-1 border-r border-slate-200 last:border-r-0 min-h-[60px]">
-                    {hourAgendamentos.map((agendamento) => {
-                      const cliente = clientes.find(c => c.id === agendamento.clienteId);
-                      const barbeiro = barbeiros.find(b => b.id === agendamento.barbeiroId);
-                      const servicosNomes = agendamento.servicoIds.map(id => 
-                        servicos.find(s => s.id === id)?.nome
-                      ).filter(Boolean);
+                    {hourAgendamentos.map((agendamento: Agendamento) => {
+                      const cliente = clientes.find((c: Cliente) => c.id === agendamento.clienteId);
+                      const barbeiro = barbeiros.find((b: Barbeiro) => b.id === agendamento.barbeiroId);
+                      const servicosNomes = agendamento.servicoIds.map((id: string) => 
+                        servicos.find((s: Servico) => s.id === id)?.nome
+                      ).filter((nome): nome is string => !!nome);
 
                       return (
                         <div 
@@ -158,12 +166,12 @@ const Horarios: React.FC = () => {
   // Renderização da visualização diária
   const renderDayView = () => {
     const dayAgendamentos = getAgendamentosForDate(currentDate);
-    const barbeirosAtivos = barbeiros.filter(b => b.ativo);
+    const barbeirosAtivos = barbeiros.filter((b: Barbeiro) => b.ativo);
 
     return (
       <div className="space-y-6">
-        {barbeirosAtivos.map((barbeiro) => {
-          const barbeiroAgendamentos = dayAgendamentos.filter(ag => ag.barbeiroId === barbeiro.id);
+        {barbeirosAtivos.map((barbeiro: Barbeiro) => {
+          const barbeiroAgendamentos = dayAgendamentos.filter((ag: Agendamento) => ag.barbeiroId === barbeiro.id);
           const horariosDisponiveis = showAvailable ? getHorariosDisponiveis(currentDate, barbeiro.id) : [];
 
           return (
@@ -196,12 +204,12 @@ const Horarios: React.FC = () => {
                 ) : (
                   <div className="space-y-3">
                     {barbeiroAgendamentos
-                      .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
-                      .map((agendamento) => {
-                        const cliente = clientes.find(c => c.id === agendamento.clienteId);
-                        const servicosNomes = agendamento.servicoIds.map(id => 
-                          servicos.find(s => s.id === id)?.nome
-                        ).filter(Boolean);
+                      .sort((a: Agendamento, b: Agendamento) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
+                      .map((agendamento: Agendamento) => {
+                        const cliente = clientes.find((c: Cliente) => c.id === agendamento.clienteId);
+                        const servicosNomes = agendamento.servicoIds.map((id: string) => 
+                          servicos.find((s: Servico) => s.id === id)?.nome
+                        ).filter((nome): nome is string => !!nome);
 
                         return (
                           <div key={agendamento.id} className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg">
@@ -315,8 +323,8 @@ const Horarios: React.FC = () => {
                   {day.getDate()}
                 </div>
                 <div className="space-y-1">
-                  {dayAgendamentos.slice(0, 3).map((agendamento) => {
-                    const cliente = clientes.find(c => c.id === agendamento.clienteId);
+                  {dayAgendamentos.slice(0, 3).map((agendamento: Agendamento) => {
+                    const cliente = clientes.find((c: Cliente) => c.id === agendamento.clienteId);
                     return (
                       <div 
                         key={agendamento.id}
@@ -407,7 +415,7 @@ const Horarios: React.FC = () => {
                   className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm"
                 >
                   <option value="todos">Todos os Barbeiros</option>
-                  {barbeiros.filter(b => b.ativo).map((barbeiro) => (
+                  {barbeiros.filter((b: Barbeiro) => b.ativo).map((barbeiro: Barbeiro) => (
                     <option key={barbeiro.id} value={barbeiro.id}>
                       {barbeiro.nome}
                     </option>
@@ -436,7 +444,7 @@ const Horarios: React.FC = () => {
                   ].map(({ mode, label }) => (
                     <button
                       key={mode}
-                      onClick={() => setViewMode(mode as any)}
+                      onClick={() => setViewMode(mode as 'day' | 'week' | 'month')}
                       className={`px-3 py-1 text-sm rounded transition-colors ${
                         viewMode === mode
                           ? 'bg-white text-slate-800 shadow-sm'

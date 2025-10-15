@@ -22,9 +22,9 @@ export interface UserDB {
   id: number;
   nome: string;
   email: string;
-  password_hash: string;
+  senha: string;
   role: UserRole;
-  ativo: number;
+  ativo: boolean;
   created_at: string;
   updated_at?: string;
 }

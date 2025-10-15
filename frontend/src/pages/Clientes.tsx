@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Users, Plus, Search, Filter, Phone, Mail, Calendar, Edit, Trash2 } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useClientes } from '../contexts/clientes';
 import Modal from '../components/common/Modal';
 import ClienteForm from '../components/common/ClienteForm';
 import type { Cliente } from '../types';
 
 const Clientes: React.FC = () => {
-  const { clientes, excluirCliente } = useApp();
+  const { items: clientes, remove: removerCliente, loading } = useClientes();
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [modalAberto, setModalAberto] = useState(false);
@@ -15,7 +15,7 @@ const Clientes: React.FC = () => {
   const clientesFiltrados = clientes.filter(cliente => {
     const matchBusca = busca === '' || 
       cliente.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      cliente.email.toLowerCase().includes(busca.toLowerCase()) ||
+      (cliente.email && cliente.email.toLowerCase().includes(busca.toLowerCase())) ||
       cliente.telefone.includes(busca);
     
     const matchStatus = filtroStatus === 'todos' || 
@@ -37,7 +37,7 @@ const Clientes: React.FC = () => {
 
   const handleExcluirCliente = async (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
-      await excluirCliente(id);
+      await removerCliente(id);
     }
   };
 
@@ -47,8 +47,13 @@ const Clientes: React.FC = () => {
   };
 
   const handleSaveCliente = () => {
-    // Função chamada após salvar o cliente no formulário
-    // O formulário já gerencia a criação/atualização através do context
+    try {
+      // Função chamada após salvar o cliente no formulário
+      // O formulário já gerencia a criação/atualização através do context
+      console.log('✅ Callback de salvamento de cliente executado');
+    } catch (error) {
+      console.error('Erro no callback de salvamento:', error);
+    }
   };
 
   return (
@@ -56,7 +61,9 @@ const Clientes: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-2xl lg:text-4xl font-bold text-slate-800 mb-1">Clientes</h1>
+          <h1 className="text-2xl lg:text-4xl font-bold text-slate-800 mb-1">
+            Clientes {loading.isLoading && <span className="text-amber-500">⟳</span>}
+          </h1>
           <p className="text-slate-600 text-sm lg:text-base">Gerencie sua base de clientes</p>
         </div>
         <button 
@@ -185,7 +192,7 @@ const Clientes: React.FC = () => {
                 <div className="flex items-center gap-2 text-slate-600">
                   <Calendar className="w-4 h-4 shrink-0" />
                   <span className="text-xs lg:text-sm">
-                    Desde {cliente.dataCadastro.toLocaleDateString('pt-BR')}
+                    Desde {cliente.dataCadastro ? cliente.dataCadastro.toLocaleDateString('pt-BR') : 'N/A'}
                   </span>
                 </div>
 

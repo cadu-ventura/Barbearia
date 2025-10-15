@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { User, Plus, Search, Star, Clock, DollarSign, Edit, Trash2 } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useBarbeiros } from '../contexts';
 import Modal from '../components/common/Modal';
 import BarbeiroForm from '../components/common/BarbeiroForm';
 
 const Barbeiros: React.FC = () => {
-  const { barbeiros, excluirBarbeiro } = useApp();
+  const { items: barbeiros, remove: excluirBarbeiro } = useBarbeiros();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBarbeiro, setSelectedBarbeiro] = useState<any>(null);
+  const [selectedBarbeiro, setSelectedBarbeiro] = useState<typeof barbeiros[0] | null>(null);
 
   const filteredBarbeiros = barbeiros.filter(barbeiro =>
     barbeiro.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    barbeiro.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    barbeiro.especialidades.some((esp: string) => esp.toLowerCase().includes(searchTerm.toLowerCase()))
+    (barbeiro.email && barbeiro.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    barbeiro.especialidades.some((esp) => esp.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleEdit = (barbeiro: any) => {
+  const handleEdit = (barbeiro: typeof barbeiros[0]) => {
     setSelectedBarbeiro(barbeiro);
     setIsModalOpen(true);
   };
@@ -39,14 +39,9 @@ const Barbeiros: React.FC = () => {
   // Calcular estatísticas
   const barbeirosAtivos = barbeiros.filter(b => b.ativo);
   const comissaoMedia = barbeirosAtivos.length > 0 
-    ? barbeirosAtivos.reduce((sum, b) => sum + b.comissao, 0) / barbeirosAtivos.length 
+    ? barbeirosAtivos.reduce((sum, b) => sum + (b.comissao || 0), 0) / barbeirosAtivos.length 
     : 0;
   const totalAtendimentos = barbeiros.reduce((sum, b) => sum + (b.totalAtendimentos || 0), 0);
-
-  const getDiaSemanaLabel = (dia: number) => {
-    const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-    return dias[dia];
-  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -220,14 +215,11 @@ const Barbeiros: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-slate-700 mb-2">Horário de Trabalho:</p>
                       <div className="space-y-1 max-h-24 overflow-y-auto">
-                        {barbeiro.horarioTrabalho.slice(0, 3).map((horario: any, index: number) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span className="text-slate-600">{getDiaSemanaLabel(horario.diaSemana)}:</span>
-                            <span className="text-slate-800">{horario.horaInicio} - {horario.horaFim}</span>
-                          </div>
-                        ))}
-                        {barbeiro.horarioTrabalho.length > 3 && (
-                          <p className="text-xs text-slate-500">+{barbeiro.horarioTrabalho.length - 3} dias...</p>
+                        {barbeiro.horarioTrabalho && typeof barbeiro.horarioTrabalho === 'string' && (
+                          <p className="text-sm text-slate-800">{barbeiro.horarioTrabalho}</p>
+                        )}
+                        {!barbeiro.horarioTrabalho && (
+                          <p className="text-sm text-slate-500">Não informado</p>
                         )}
                       </div>
                     </div>
@@ -242,7 +234,7 @@ const Barbeiros: React.FC = () => {
                         <div>
                           <p className="text-slate-600">Cadastro:</p>
                           <p className="font-medium text-slate-800">
-                            {new Date(barbeiro.dataCadastro).toLocaleDateString()}
+                            {barbeiro.dataCadastro ? new Date(barbeiro.dataCadastro).toLocaleDateString() : 'Não informado'}
                           </p>
                         </div>
                       </div>
@@ -281,7 +273,7 @@ const Barbeiros: React.FC = () => {
         size="xl"
       >
         <BarbeiroForm
-          barbeiro={selectedBarbeiro}
+          barbeiro={selectedBarbeiro || undefined}
           onClose={handleModalClose}
           onSave={handleModalSave}
         />

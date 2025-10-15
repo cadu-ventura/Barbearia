@@ -89,7 +89,7 @@ router.post('/register', [
 
     // Verificar se o email já existe
     const existingUser = await req.db.get(
-      'SELECT id FROM users WHERE email = ?',
+      'SELECT id FROM usuarios WHERE email = ?',
       [userData.email]
     ) as UserDB | undefined;
 
@@ -106,9 +106,9 @@ router.post('/register', [
 
     // Inserir usuário no banco
     const result = await req.db.run(`
-      INSERT INTO users (nome, email, password_hash, role, ativo)
-      VALUES (?, ?, ?, ?, 1)
-    `, [userData.nome, userData.email, passwordHash, userData.role]);
+      INSERT INTO usuarios (nome, email, senha, role, ativo)
+      VALUES (?, ?, ?, ?, ?)
+    `, [userData.nome, userData.email, passwordHash, userData.role, true]);
 
     const newUser: Partial<User> = {
       id: result.lastID?.toString(),
@@ -158,8 +158,8 @@ router.post('/login', [
 
     // Buscar usuário por email
     const user = await req.db.get(`
-      SELECT id, nome, email, password_hash, role, ativo 
-      FROM users 
+      SELECT id, nome, email, senha, role, ativo 
+      FROM usuarios 
       WHERE email = ?
     `, [credentials.email]) as UserDB | undefined;
 
@@ -179,7 +179,7 @@ router.post('/login', [
     }
 
     // Verificar senha
-    const isPasswordValid = await bcrypt.compare(credentials.password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(credentials.password, user.senha);
     
     if (!isPasswordValid) {
       return res.status(401).json({

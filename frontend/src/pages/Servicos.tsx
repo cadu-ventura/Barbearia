@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { Scissors, Clock, DollarSign, TrendingUp, Search, Plus, Edit, Trash2 } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useServicos } from '../contexts';
 import Modal from '../components/common/Modal';
 import ServicoForm from '../components/common/ServicoForm';
 
 const Servicos: React.FC = () => {
-  const { servicos, excluirServico } = useApp();
+  const { items: servicos, remove: excluirServico } = useServicos();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedServico, setSelectedServico] = useState<any>(null);
+  const [selectedServico, setSelectedServico] = useState<typeof servicos[0] | null>(null);
 
   const filteredServicos = servicos.filter(servico =>
     servico.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    servico.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    servico.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+    (servico.categoria && servico.categoria.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (servico.descricao && servico.descricao.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleEdit = (servico: any) => {
+  const handleEdit = (servico: typeof servicos[0]) => {
     setSelectedServico(servico);
     setIsModalOpen(true);
   };
@@ -315,7 +315,7 @@ const Servicos: React.FC = () => {
         size="lg"
       >
         <ServicoForm
-          servico={selectedServico}
+          servico={selectedServico || undefined}
           onClose={handleModalClose}
           onSave={handleModalSave}
         />

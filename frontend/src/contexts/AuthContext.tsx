@@ -34,51 +34,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Verificar token ao carregar a aplicação
   useEffect(() => {
-    // Para desenvolvimento: sempre mostrar tela de login
-    // Limpar token existente para forçar novo login
-    localStorage.removeItem('auth_token');
-    setLoading(false);
-    
-    // Caso queira manter login persistente, descomente as linhas abaixo:
-    // const token = localStorage.getItem('auth_token');
-    // if (token) {
-    //   verifyToken();
-    // } else {
-    //   setLoading(false);
-    // }
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      verifyToken();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  // const verifyToken = async () => {
-  //   try {
-  //     // Como estamos usando dados mock, simular verificação
-  //     const token = localStorage.getItem('auth_token');
-  //     if (token) {
-  //       // Simular usuário logado
-  //       setUser({
-  //         id: '1',
-  //         nome: 'Usuário Admin',
-  //         email: 'admin@hoshirara.com',
-  //         tipo: 'admin'
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error('Token inválido:', error);
-  //     localStorage.removeItem('auth_token');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const verifyToken = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        // Simular usuário logado com token válido
+        setUser({
+          id: '1',
+          nome: 'Administrador',
+          email: 'admin@hoshirara.com',
+          tipo: 'admin'
+        });
+      }
+    } catch (error) {
+      console.error('Token inválido:', error);
+      localStorage.removeItem('auth_token');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = async (email: string, senha: string) => {
     try {
       const response = await api.login(email, senha);
       
       if (response.success && response.data) {
+        const apiUser: any = response.data.user || response.data;
         const userData = {
-          id: response.data.user.id,
-          nome: response.data.user.nome,
-          email: response.data.user.email,
-          tipo: response.data.user.tipo || 'admin'
+          id: apiUser.id,
+          nome: apiUser.nome,
+          email: apiUser.email,
+          tipo: apiUser.role || 'admin'
         };
         
         setUser(userData);
@@ -102,11 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.register(userData);
       
       if (response.success && response.data) {
+        const apiUser: any = response.data.user || response.data;
         const user = {
-          id: response.data.user.id,
-          nome: response.data.user.nome,
-          email: response.data.user.email,
-          tipo: response.data.user.tipo || 'admin'
+          id: apiUser.id,
+          nome: apiUser.nome,
+          email: apiUser.email,
+          tipo: apiUser.role || 'admin'
         };
         
         setUser(user);

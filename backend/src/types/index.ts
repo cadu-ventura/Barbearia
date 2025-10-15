@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Database } from 'sqlite3';
 
 export interface DatabaseRequest extends Request {
   db: {

@@ -9,12 +9,22 @@ import {
   Award,
   Download
 } from 'lucide-react';
-import { useApp } from '../hooks/useApp';
+import { useAgendamentos } from '../contexts/agendamentos';
+import { useBarbeiros } from '../contexts/barbeiros';
+import { useClientes } from '../contexts/clientes';
+import { useServicos } from '../contexts/servicos';
 
 const Relatorios: React.FC = () => {
-  const { agendamentos, clientes, barbeiros, servicos, movimentacoes } = useApp();
+  const { items: agendamentos } = useAgendamentos();
+  const { items: clientes } = useClientes();
+  const { items: barbeiros } = useBarbeiros();
+  const { items: servicos } = useServicos();
+  
   const [periodoSelecionado, setPeriodoSelecionado] = useState<'7d' | '30d' | '3m' | '1a'>('30d');
   const [relatorioAtivo, setRelatorioAtivo] = useState<'financeiro' | 'agendamentos' | 'barbeiros' | 'clientes' | 'servicos'>('financeiro');
+
+  // TODO: Implementar contexto de movimentações financeiras
+  const movimentacoes = useMemo(() => [] as Array<{tipo: 'receita' | 'despesa', valor: number, data: Date | string}>, []); // Placeholder até implementar MovimentacoesContext
 
   // Função para calcular período
   const calcularPeriodo = (periodo: string) => {
@@ -210,8 +220,8 @@ const Relatorios: React.FC = () => {
     .filter(cliente => cliente.totalAgendamentos > 0)
     .sort((a, b) => b.gastoTotal - a.gastoTotal);
     
-    const novosCLientes = clientes.filter(cliente => {
-      const dataCadastro = new Date(cliente.dataCadastro);
+    const novosCLientes = clientes.filter((cliente) => {
+      const dataCadastro = cliente.dataCadastro ? new Date(cliente.dataCadastro) : new Date();
       const { inicio } = calcularPeriodo(periodoSelecionado);
       return dataCadastro >= inicio;
     });
@@ -222,7 +232,7 @@ const Relatorios: React.FC = () => {
       novosClientes: novosCLientes.length,
       clientesComMaisAgendamentos: clientesComMaisAgendamentos.slice(0, 10),
       ticketMedioCliente: clientesComMaisAgendamentos.length > 0 ? 
-        clientesComMaisAgendamentos.reduce((acc, c) => acc + c.gastoTotal, 0) / clientesComMaisAgendamentos.length : 0
+        clientesComMaisAgendamentos.reduce((acc: number, c) => acc + c.gastoTotal, 0) / clientesComMaisAgendamentos.length : 0
     };
   }, [clientes, dadosPeriodo, periodoSelecionado]);
 
@@ -258,7 +268,8 @@ const Relatorios: React.FC = () => {
         ag.servicoIds.includes(servico.id)
       ).length;
       
-      acc[servico.categoria] = (acc[servico.categoria] || 0) + vezesAgendado;
+      const categoria = servico.categoria || 'outros';
+      acc[categoria] = (acc[categoria] || 0) + vezesAgendado;
       return acc;
     }, {} as Record<string, number>);
     
@@ -859,7 +870,7 @@ const Relatorios: React.FC = () => {
                 <Calendar className="w-4 lg:w-5 h-4 lg:h-5 text-slate-600" />
                 <select
                   value={periodoSelecionado}
-                  onChange={(e) => setPeriodoSelecionado(e.target.value as any)}
+                  onChange={(e) => setPeriodoSelecionado(e.target.value as '7d' | '30d' | '3m' | '1a')}
                   className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm lg:text-base"
                 >
                   {Object.entries(periodoLabels).map(([value, label]) => (
@@ -890,7 +901,7 @@ const Relatorios: React.FC = () => {
               ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setRelatorioAtivo(id as any)}
+                  onClick={() => setRelatorioAtivo(id as 'financeiro' | 'agendamentos' | 'barbeiros' | 'clientes' | 'servicos')}
                   className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium whitespace-nowrap transition-colors ${
                     relatorioAtivo === id
                       ? 'border-amber-500 text-amber-600'

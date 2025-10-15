@@ -55,9 +55,7 @@ export const clienteValidation = [
   body('nome')
     .trim()
     .isLength({ min: 2, max: 100 })
-    .withMessage('Nome deve ter entre 2 e 100 caracteres')
-    .matches(/^[A-Za-zÀ-ÿ\u00f1\u00d1 ]+$/)
-    .withMessage('Nome deve conter apenas letras e espaços'),
+    .withMessage('Nome deve ter entre 2 e 100 caracteres'),
   
   body('email')
     .optional({ nullable: true, checkFalsy: true })
@@ -66,8 +64,9 @@ export const clienteValidation = [
     .normalizeEmail(),
   
   body('telefone')
-    .matches(/^\(\d{2}\)\s\d{4,5}-\d{4}$/)
-    .withMessage('Telefone deve estar no formato (11) 99999-9999'),
+    .trim()
+    .isLength({ min: 10, max: 20 })
+    .withMessage('Telefone deve ter entre 10 e 20 caracteres'),
   
   body('cpf')
     .optional({ nullable: true, checkFalsy: true })
@@ -182,11 +181,6 @@ export const servicoValidation = [
   body('duracao')
     .isInt({ min: 5, max: 480 })
     .withMessage('Duração deve estar entre 5 e 480 minutos'),
-  
-  body('categoria')
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Categoria deve ter entre 2 e 50 caracteres'),
 
   handleValidationErrors
 ];

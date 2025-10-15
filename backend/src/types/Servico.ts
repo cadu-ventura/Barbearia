@@ -24,8 +24,7 @@ export interface ServicoDB {
   descricao?: string;
   preco: number;
   duracao: number;
-  categoria: string;
   ativo: number;
-  created_at: string;
-  updated_at?: string;
+  data_cadastro: string;
+  data_atualizacao?: string;
 }

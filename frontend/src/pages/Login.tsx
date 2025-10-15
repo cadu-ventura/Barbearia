@@ -77,17 +77,18 @@ const Login: React.FC<LoginProps> = ({ onLogin, onNavigateToRegister }) => {
                 Email do Profissional
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-blue-400" />
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  <User className="h-4 w-4 text-blue-400" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-blue-50/10 border-2 border-blue-300/30 rounded-xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all backdrop-blur-sm"
+                  className="w-full pl-8 pr-3 py-2 bg-white/90 border-2 border-blue-300/30 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all backdrop-blur-sm"
                   placeholder="Digite seu email profissional"
                   disabled={isLoading}
+                  style={{ color: '#000000' }}
                 />
               </div>
             </div>
@@ -98,28 +99,29 @@ const Login: React.FC<LoginProps> = ({ onLogin, onNavigateToRegister }) => {
                 Senha de Acesso
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-blue-400" />
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-blue-400" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-blue-50/10 border-2 border-blue-300/30 rounded-xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all backdrop-blur-sm"
+                  className="w-full pl-8 pr-10 py-2 bg-white/90 border-2 border-blue-300/30 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all backdrop-blur-sm"
                   placeholder="Digite sua senha"
                   disabled={isLoading}
+                  style={{ color: '#000000' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-2 flex items-center"
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-blue-300 hover:text-blue-100 transition-colors" />
+                    <EyeOff className="h-4 w-4 text-blue-300 hover:text-blue-100 transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-blue-300 hover:text-blue-100 transition-colors" />
+                    <Eye className="h-4 w-4 text-blue-300 hover:text-blue-100 transition-colors" />
                   )}
                 </button>
               </div>
@@ -136,7 +138,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onNavigateToRegister }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-blue-400/50 disabled:to-indigo-500/50 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-blue-400/50 disabled:to-indigo-500/50 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <>
