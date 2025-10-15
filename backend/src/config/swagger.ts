@@ -8,18 +8,18 @@ const options = {
       title: 'Barbearia Hoshirara API',
       version: '1.0.0',
       description: `
-        ## 💈 API REST da Barbearia Hoshirara
+        ##  API REST da Barbearia Hoshirara
         
         Sistema completo de gerenciamento para barbearias com:
-        - 👥 **Gestão de Clientes** - CRUD completo com histórico
-        - ✂️ **Cadastro de Barbeiros** - Especialidades e comissões
-        - 📅 **Sistema de Agendamentos** - Controle de horários e status
-        - 💰 **Controle Financeiro** - Receitas, despesas e relatórios
-        - 🔐 **Autenticação JWT** - Segurança empresarial
-        - 🛡️ **Rate Limiting** - Proteção contra spam
-        - 📊 **Relatórios** - Dashboards e analytics
+        -  **Gestão de Clientes** - CRUD completo com histórico
+        -  **Cadastro de Barbeiros** - Especialidades e comissões
+        -  **Sistema de Agendamentos** - Controle de horários e status
+        -  **Controle Financeiro** - Receitas, despesas e relatórios
+        -  **Autenticação JWT** - Segurança empresarial
+        -  **Rate Limiting** - Proteção contra spam
+        -  **Relatórios** - Dashboards e analytics
         
-        ### 🚀 Tecnologias:
+        ###  Tecnologias:
         - **Backend:** TypeScript + Express.js
         - **Banco:** SQLite (promisificado)
         - **Segurança:** JWT + bcryptjs + helmet
@@ -312,7 +312,7 @@ const options = {
         },
         LoginRequest: {
           type: 'object',
-          required: ['email', 'senha'],
+          required: ['email', 'password'],
           properties: {
             email: {
               type: 'string',
@@ -320,10 +320,43 @@ const options = {
               description: 'Email do usuário',
               example: 'admin@hoshirara.com'
             },
-            senha: {
+            password: {
               type: 'string',
               description: 'Senha do usuário',
-              example: '123456'
+              example: 'admin123',
+              minLength: 6
+            }
+          }
+        },
+        RegisterRequest: {
+          type: 'object',
+          required: ['nome', 'email', 'password', 'role'],
+          properties: {
+            nome: {
+              type: 'string',
+              description: 'Nome completo do usuário',
+              example: 'João Silva',
+              minLength: 2,
+              maxLength: 100
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Email do usuário',
+              example: 'joao@hoshirara.com'
+            },
+            password: {
+              type: 'string',
+              description: 'Senha do usuário (mín. 8 caracteres com maiúscula, minúscula, número e especial)',
+              example: 'MinhaSenh@123',
+              minLength: 8,
+              pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]'
+            },
+            role: {
+              type: 'string',
+              enum: ['admin', 'funcionario', 'barbeiro'],
+              description: 'Tipo de usuário',
+              example: 'funcionario'
             }
           }
         },
@@ -397,33 +430,33 @@ const options = {
     tags: [
       {
         name: 'Auth',
-        description: '🔐 Autenticação e autorização'
+        description: 'Autenticação e autorização'
       },
       {
         name: 'Clientes',
-        description: '👥 Gestão de clientes'
+        description: 'Gestão de clientes'
       },
       {
         name: 'Barbeiros',
-        description: '✂️ Gestão de barbeiros'
+        description: 'Gestão de barbeiros'
       },
       {
         name: 'Serviços',
-        description: '💼 Gestão de serviços'
+        description: 'Gestão de serviços'
       },
       {
         name: 'Agendamentos',
-        description: '📅 Sistema de agendamentos'
+        description: 'Sistema de agendamentos'
       },
       {
         name: 'Financeiro',
-        description: '💰 Controle financeiro'
+        description: 'Controle financeiro'
       }
     ]
   },
   apis: [
-    './src/routes/*.ts',
-    './src/server.ts'
+    __dirname + '/../routes/*.ts',
+    __dirname + '/../server.ts'
   ]
 };
 
